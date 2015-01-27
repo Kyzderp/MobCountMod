@@ -23,8 +23,10 @@ import com.mumfrey.liteloader.modconfig.ExposableOptions;
 @ExposableOptions(strategy = ConfigStrategy.Versioned, filename="mobcountermod.json")
 public class LiteModMobCounter implements Tickable
 {
-	private boolean staff = false;
-	private boolean showChildCounts = true;
+	private static final boolean staff = true;
+	private static final boolean useOptions = false;
+	
+	private boolean showChildCounts = false;
 	
 	private MobCounterConfigScreen configScreen = new MobCounterConfigScreen();
 	private MobCounter counter = new MobCounter();
@@ -33,14 +35,17 @@ public class LiteModMobCounter implements Tickable
 	private static KeyBinding optionsKeyBinding;
 
 
-	private int counterVisible = 1; // 0 - not visible, 1 - compact, 2 - expanded
+	private int counterVisible = 0; // 0 - not visible, 1 - compact, 2 - expanded
 	private int hostileVisible = 0;
+	private int playSoundCount = 100;
 
 	public LiteModMobCounter() {}
 
 	@Override
 	public String getName()
 	{
+		if (this.staff)
+			return "Mob Counter - Staff";
 		return "Mob Counter";
 	}
 
@@ -55,15 +60,19 @@ public class LiteModMobCounter implements Tickable
 	{
 		counterKeyBinding = new KeyBinding("key.counter.toggle", Keyboard.KEY_P, "key.categories.litemods");
 		hostileKeyBinding = new KeyBinding("key.counter.togglehostile", Keyboard.KEY_O, "key.categories.litemods");
-		optionsKeyBinding = new KeyBinding("key.counter.options", Keyboard.KEY_SEMICOLON, "key.categories.litemods");
+		if (this.useOptions)
+			optionsKeyBinding = new KeyBinding("key.counter.options", Keyboard.KEY_SEMICOLON, "key.categories.litemods");
 		
 		LiteLoader.getInput().registerKeyBinding(counterKeyBinding);
 		LiteLoader.getInput().registerKeyBinding(hostileKeyBinding);
+		if (this.useOptions)
+			LiteLoader.getInput().registerKeyBinding(optionsKeyBinding);
 	}
 
 	@Override
 	public void upgradeSettings(String version, File configPath, File oldConfigPath) {}
 
+	@SuppressWarnings("unused")
 	@Override
 	public void onTick(Minecraft minecraft, float partialTicks, boolean inGame, boolean clock)
 	{
@@ -73,7 +82,7 @@ public class LiteModMobCounter implements Tickable
 		}
 		if (inGame && minecraft.currentScreen == null && Minecraft.isGuiEnabled())
 		{
-			if (LiteModMobCounter.optionsKeyBinding.isPressed())
+			if (this.useOptions && LiteModMobCounter.optionsKeyBinding.isPressed())
 			{
 				minecraft.displayGuiScreen(this.configScreen);
 			}
@@ -172,8 +181,20 @@ public class LiteModMobCounter implements Tickable
 						fontRender.drawStringWithShadow(mobs[i] + count, 90, i * 10 - 30 + offset, 0xFFFFFF);
 				}
 				int color = 0xFFFFFF;
-				if (totalCount > 64)
+				if (totalCount > 149) // if 150+ mobs, display in red and play sound.
+				{
 					color = 0xAA0000;
+					if (this.playSoundCount == 0)
+						Minecraft.getMinecraft().thePlayer.playSound("note.bass", 1.0F, 1.0F);
+					else
+					{
+						if (this.playSoundCount > 99)
+							this.playSoundCount = -1;
+					}
+					this.playSoundCount++;
+				}
+				else
+					this.playSoundCount = 100;
 				fontRender.drawStringWithShadow("Total: " + totalCount, 60, offset, color);
 			}
 
