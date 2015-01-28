@@ -20,13 +20,16 @@ public class MobCounter {
 	private int hRadius; //radius for hostiles
 	private AxisAlignedBB hostileBB;
 
-	public MobCounter()
+	public MobCounter(boolean isStaff)
 	{
 		this.radius = 16;
-		this.hRadius = 16;
+		if (isStaff)
+			this.hRadius = 25;
+		else
+			this.hRadius = 16;
+		
 		this.boundingBox = AxisAlignedBB.getBoundingBox(0, 0, 0, 0, 0, 0);
 		this.hostileBB = AxisAlignedBB.getBoundingBox(0, 0, 0, 0, 0, 0);
-
 	}
 
 	public int countEntity(int num, boolean adult)

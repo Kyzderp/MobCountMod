@@ -29,7 +29,7 @@ public class LiteModMobCounter implements Tickable
 	private boolean showChildCounts = false;
 	
 	private MobCounterConfigScreen configScreen = new MobCounterConfigScreen();
-	private MobCounter counter = new MobCounter();
+	private MobCounter counter = new MobCounter(staff);
 	private static KeyBinding counterKeyBinding;
 	private static KeyBinding hostileKeyBinding;
 	private static KeyBinding optionsKeyBinding;
@@ -37,7 +37,7 @@ public class LiteModMobCounter implements Tickable
 
 	private int counterVisible = 0; // 0 - not visible, 1 - compact, 2 - expanded
 	private int hostileVisible = 0;
-	private int playSoundCount = 100;
+	private int playSoundCount = 100; // counts down so sound plays once per sec
 
 	public LiteModMobCounter() {}
 
@@ -52,7 +52,7 @@ public class LiteModMobCounter implements Tickable
 	@Override
 	public String getVersion()
 	{
-		return "1.0.0";
+		return "1.0.2";
 	}
 
 	@Override
@@ -80,6 +80,27 @@ public class LiteModMobCounter implements Tickable
 		{
 			configScreen.updateScreen();
 		}
+		
+		if (inGame)
+		{
+			int totalCount = 0;
+			for (int i = 0; i < 8; i++)
+			{
+				totalCount += this.counter.countEntity(i + 8, true);
+			}
+			if (totalCount > 149)
+			{
+				if (this.playSoundCount == 0)
+					Minecraft.getMinecraft().thePlayer.playSound("note.bass", 1.0F, 1.0F);
+				else
+				{
+					if (this.playSoundCount > 99)
+						this.playSoundCount = -1;
+				}
+				this.playSoundCount++;
+			}
+		}
+		
 		if (inGame && minecraft.currentScreen == null && Minecraft.isGuiEnabled())
 		{
 			if (this.useOptions && LiteModMobCounter.optionsKeyBinding.isPressed())
@@ -184,14 +205,6 @@ public class LiteModMobCounter implements Tickable
 				if (totalCount > 149) // if 150+ mobs, display in red and play sound.
 				{
 					color = 0xAA0000;
-					if (this.playSoundCount == 0)
-						Minecraft.getMinecraft().thePlayer.playSound("note.bass", 1.0F, 1.0F);
-					else
-					{
-						if (this.playSoundCount > 99)
-							this.playSoundCount = -1;
-					}
-					this.playSoundCount++;
 				}
 				else
 					this.playSoundCount = 100;
