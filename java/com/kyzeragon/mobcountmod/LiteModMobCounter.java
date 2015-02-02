@@ -38,6 +38,11 @@ public class LiteModMobCounter implements Tickable
 	private int counterVisible = 0; // 0 - not visible, 1 - compact, 2 - expanded
 	private int hostileVisible = 0;
 	private int playSoundCount = 100; // counts down so sound plays once per sec
+	
+	private String[] passives = {"Chickens: ", "Pigs: ", "Sheep: ", "Cows: ", "Horses: ", "Mooshrooms: ", "Ocelots: ", "Wolves: "};
+	private String[] hostiles = {"Zombies: ", "CaveSpiders: ", "Skeletons: ", "Spiders: ", 
+			"Creepers: ", "Witches: ", "Pigmen: ", "Slimes: "};
+
 
 	public LiteModMobCounter() {}
 
@@ -83,22 +88,7 @@ public class LiteModMobCounter implements Tickable
 		
 		if (inGame)
 		{
-			int totalCount = 0;
-			for (int i = 0; i < 8; i++)
-			{
-				totalCount += this.counter.countEntity(i + 8, true);
-			}
-			if (totalCount > 149)
-			{
-				if (this.playSoundCount == 0)
-					Minecraft.getMinecraft().thePlayer.playSound("note.bass", 1.0F, 1.0F);
-				else
-				{
-					if (this.playSoundCount > 99)
-						this.playSoundCount = -1;
-				}
-				this.playSoundCount++;
-			}
+			this.playSound();
 		}
 		
 		if (inGame && minecraft.currentScreen == null && Minecraft.isGuiEnabled())
@@ -107,110 +97,174 @@ public class LiteModMobCounter implements Tickable
 			{
 				minecraft.displayGuiScreen(this.configScreen);
 			}
-			FontRenderer fontRender = minecraft.fontRenderer;
+			
 			///// Passives /////
-			if (LiteModMobCounter.counterKeyBinding.isPressed())
-			{
-				if (Keyboard.isKeyDown(Keyboard.KEY_UP))
-					this.counter.increaseRadius(staff);
-				else if (Keyboard.isKeyDown(Keyboard.KEY_DOWN))
-					this.counter.decreaseRadius();
-				else
-				{
-					this.counterVisible++;
-					if (this.counterVisible > 2)
-						this.counterVisible = 0;
-				}
-			}
+			this.passiveKey();
 
 			if (this.counterVisible > 0) // compact
 			{
-				this.counter.updateBB();
-				fontRender.drawStringWithShadow("Radius: " + this.counter.getRadius(), 0, 0, 0xFFAA00);
-				if (staff) 
-					fontRender.drawStringWithShadow("Players: " + this.counter.countEntity(16, true), 60, 0, 0xFFFFFF);
-				String toDisplay;
-
-				String[] mobs = {"Chickens: ", "Pigs: ", "Sheep: ", "Cows: ", "Horses: ", "Mooshrooms: ", "Ocelots: ", "Wolves: "};
-				int color = 0xFFFFFF;
-				for (int i = 0; i < 4; i++)
-				{
-					int count = this.counter.countEntity(i, true) + this.counter.countEntity(i, false);
-					toDisplay = "" + count;
-					if (this.showChildCounts)
-						toDisplay = this.counter.countEntity(i, false) + "/" + this.counter.countEntity(i, true);
-					if (count > 16) color = 0xAA0000;
-					fontRender.drawStringWithShadow(mobs[i] + toDisplay, 0, i * 10 + 10, color);
-					color = 0xFFFFFF;
-				}
+				this.displayPassiveCompact();
 				if (this.counterVisible > 1) // expanded
 				{
-					for (int i = 4; i < 8; i++)
-					{
-						int count = this.counter.countEntity(i, true) + this.counter.countEntity(i, false);
-						toDisplay = "" + count;
-						int x = 70;
-						if (this.showChildCounts)
-						{
-							toDisplay = this.counter.countEntity(i, false) + "/" + this.counter.countEntity(i, true);
-							x = 80;
-						}
-						if (count > 16) color = 0xAA0000;
-						fontRender.drawStringWithShadow(mobs[i] + toDisplay, x, i * 10 - 30, color);
-						color = 0xFFFFFF;
-					}
+					this.displayPassiveExpanded();
 				}
 			}
 
 			///// Hostiles /////
-			if (LiteModMobCounter.hostileKeyBinding.isPressed())
-			{
-				if (Keyboard.isKeyDown(Keyboard.KEY_UP))
-					this.counter.increaseHRadius(staff);
-				else if (Keyboard.isKeyDown(Keyboard.KEY_DOWN))
-					this.counter.decreaseHRadius();
-				else
-				{
-					this.hostileVisible++;
-					if (this.hostileVisible > 2)
-						this.hostileVisible = 0;
-				}
-			}
+			this.hostileKey();
 
 			if (this.hostileVisible > 0) // compact
 			{
-				int offset = 0;
-				if (this.counterVisible > 0)
-					offset = 50;
-
-				this.counter.updateHostileBB();
-				fontRender.drawStringWithShadow("Radius: " + this.counter.getHRadius(), 0, offset, 0xFFAA00);
-				String[] mobs = {"Zombies: ", "CaveSpiders: ", "Skeletons: ", "Spiders: ", 
-						"Creepers: ", "Witches: ", "Pigmen: ", "Slimes: "};
-				int totalCount = 0;
-				for (int i = 0; i < 4; i++)
-				{
-					int count = this.counter.countEntity(i + 8, true);
-					totalCount += count;
-					fontRender.drawStringWithShadow(mobs[i] + count, 0, i * 10 + 10 + offset, 0xFFFFFF);
-				}
-				for (int i = 4; i < 8; i++) 
-				{
-					int count = this.counter.countEntity(i + 8, true);
-					totalCount += count;
-					if (this.hostileVisible > 1)
-						fontRender.drawStringWithShadow(mobs[i] + count, 90, i * 10 - 30 + offset, 0xFFFFFF);
-				}
-				int color = 0xFFFFFF;
-				if (totalCount > 149) // if 150+ mobs, display in red and play sound.
-				{
-					color = 0xAA0000;
-				}
-				else
-					this.playSoundCount = 100;
-				fontRender.drawStringWithShadow("Total: " + totalCount, 60, offset, color);
+				this.displayHostile();
 			}
-
 		}
+	}
+	
+	/**
+	 * Plays the sound "note.bass" if there are 150+ hostile mobs in the hostile mob count radius
+	 */
+	private void playSound()
+	{
+		int totalCount = 0;
+		for (int i = 0; i < 8; i++)
+		{
+			totalCount += this.counter.countEntity(i + 8, true);
+		}
+		if (totalCount > 149)
+		{
+			if (this.playSoundCount == 0)
+				Minecraft.getMinecraft().thePlayer.playSound("note.bass", 1.0F, 1.0F);
+			else
+			{
+				if (this.playSoundCount > 99)
+					this.playSoundCount = -1;
+			}
+			this.playSoundCount++;
+		}
+	}
+	
+	/**
+	 * Adjust passive counter's settings according to key input
+	 */
+	private void passiveKey()
+	{
+		if (LiteModMobCounter.counterKeyBinding.isPressed())
+		{
+			if (Keyboard.isKeyDown(Keyboard.KEY_UP))
+				this.counter.increaseRadius(staff);
+			else if (Keyboard.isKeyDown(Keyboard.KEY_DOWN))
+				this.counter.decreaseRadius();
+			else
+			{
+				this.counterVisible++;
+				if (this.counterVisible > 2)
+					this.counterVisible = 0;
+			}
+		}
+	}
+	
+	/**
+	 * Adjust hostile counter's settings according to key input
+	 */
+	private void hostileKey()
+	{
+		if (LiteModMobCounter.hostileKeyBinding.isPressed())
+		{
+			if (Keyboard.isKeyDown(Keyboard.KEY_UP))
+				this.counter.increaseHRadius(staff);
+			else if (Keyboard.isKeyDown(Keyboard.KEY_DOWN))
+				this.counter.decreaseHRadius();
+			else
+			{
+				this.hostileVisible++;
+				if (this.hostileVisible > 2)
+					this.hostileVisible = 0;
+			}
+		}
+	}
+	
+	/**
+	 * Display compact passive
+	 */
+	private void displayPassiveCompact()
+	{
+		FontRenderer fontRender = Minecraft.getMinecraft().fontRenderer;
+		this.counter.updateBB();
+		fontRender.drawStringWithShadow("Radius: " + this.counter.getRadius(), 0, 0, 0xFFAA00);
+		if (staff) 
+			fontRender.drawStringWithShadow("Players: " + this.counter.countEntity(16, true), 60, 0, 0xFFFFFF);
+		String toDisplay;
+
+		int color = 0xFFFFFF;
+		for (int i = 0; i < 4; i++)
+		{
+			int count = this.counter.countEntity(i, true) + this.counter.countEntity(i, false);
+			toDisplay = "" + count;
+			if (this.showChildCounts)
+				toDisplay = this.counter.countEntity(i, false) + "/" + this.counter.countEntity(i, true);
+			if (count > 16) color = 0xAA0000;
+			fontRender.drawStringWithShadow(this.passives[i] + toDisplay, 0, i * 10 + 10, color);
+			color = 0xFFFFFF;
+		}
+	}
+	
+	/**
+	 * Display expanded passive
+	 */
+	private void displayPassiveExpanded()
+	{
+		for (int i = 4; i < 8; i++)
+		{
+			FontRenderer fontRender = Minecraft.getMinecraft().fontRenderer;
+			int color = 0xFFFFFF;
+			int count = this.counter.countEntity(i, true) + this.counter.countEntity(i, false);
+			String toDisplay = "" + count;
+			int x = 70;
+			if (this.showChildCounts)
+			{
+				toDisplay = this.counter.countEntity(i, false) + "/" + this.counter.countEntity(i, true);
+				x = 80;
+			}
+			if (count > 16) color = 0xAA0000;
+			fontRender.drawStringWithShadow(this.passives[i] + toDisplay, x, i * 10 - 30, color);
+			color = 0xFFFFFF;
+		}
+	}
+	
+	/**
+	 * Display hostile counter
+	 */
+	private void displayHostile()
+	{
+		FontRenderer fontRender = Minecraft.getMinecraft().fontRenderer;
+		int offset = 0;
+		if (this.counterVisible > 0)
+			offset = 50;
+
+		this.counter.updateHostileBB();
+		fontRender.drawStringWithShadow("Radius: " + this.counter.getHRadius(), 0, offset, 0xFFAA00);
+
+		int totalCount = 0;
+		for (int i = 0; i < 4; i++)
+		{
+			int count = this.counter.countEntity(i + 8, true);
+			totalCount += count;
+			fontRender.drawStringWithShadow(this.hostiles[i] + count, 0, i * 10 + 10 + offset, 0xFFFFFF);
+		}
+		for (int i = 4; i < 8; i++) 
+		{
+			int count = this.counter.countEntity(i + 8, true);
+			totalCount += count;
+			if (this.hostileVisible > 1)
+				fontRender.drawStringWithShadow(this.hostiles[i] + count, 90, i * 10 - 30 + offset, 0xFFFFFF);
+		}
+		int color = 0xFFFFFF;
+		if (totalCount > 149) // if 150+ mobs, display in red and play sound.
+		{
+			color = 0xAA0000;
+		}
+		else
+			this.playSoundCount = 100;
+		fontRender.drawStringWithShadow("Total: " + totalCount, 60, offset, color);
 	}
 }
