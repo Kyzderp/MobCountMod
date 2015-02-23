@@ -13,7 +13,7 @@
 <!-- The file is well commented and you should have a read through this script before making     -->
 <!-- changes to ensure that you know how it works.                                               -->
 
-<project name="mobcounter_rebelangel" basedir="." default="main">
+<project name="mobcounter_staff" basedir="." default="main">
 
 	<!-- The version of your mod, can be any string as long as it's valid as part of a file name -->
 	<!-- and should match the version string returned by your mod.                               -->

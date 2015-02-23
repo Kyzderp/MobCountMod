@@ -11,7 +11,8 @@ import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiLabel;
 import net.minecraft.client.gui.GuiScreen;
 
-public class MobCounterConfigScreen extends GuiScreen {
+public class MobCounterConfigScreen extends GuiScreen 
+{
 
 	public MobCounterConfigScreen()
 	{

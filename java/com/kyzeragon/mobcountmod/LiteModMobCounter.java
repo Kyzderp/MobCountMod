@@ -33,7 +33,7 @@ public class LiteModMobCounter implements Tickable, ChatFilter, OutboundChatList
 {
 	private static final boolean staff = true;
 	private static final boolean useOptions = false;
-	private static final boolean rebel = true;
+	private static final boolean rebel = false;
 	private static KeyBinding counterKeyBinding;
 	private static KeyBinding hostileKeyBinding;
 	private static KeyBinding optionsKeyBinding;
@@ -221,7 +221,7 @@ public class LiteModMobCounter implements Tickable, ChatFilter, OutboundChatList
 	 */
 	private void hostileLimit()
 	{
-		System.out.println("playSoundCount: " + this.playSoundCount + " sendMsgCount: " + this.sendMsgCount);
+//		System.out.println("playSoundCount: " + this.playSoundCount + " sendMsgCount: " + this.sendMsgCount);
 		int totalCount = 0;
 		for (int i = 0; i < 8; i++)
 			totalCount += this.counter.countEntity(i + 8, true);
