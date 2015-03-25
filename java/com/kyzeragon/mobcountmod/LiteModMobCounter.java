@@ -43,10 +43,11 @@ public class LiteModMobCounter implements Tickable, ChatFilter, OutboundChatList
 	private MobCounterConfigScreen configScreen = new MobCounterConfigScreen();
 	private MobCounter counter = new MobCounter(staff);
 	private String[] toMessage;
+	private boolean notifyFac;
 	private String sound;
 
 	private int counterVisible = 0; // 0 - not visible, 1 - compact, 2 - expanded
-	private int hostileVisible = 1;
+	private int hostileVisible = 0;
 	private int playSoundCount = 0; // counts up so sound plays once per sec
 	private int sendMsgCount = 0; // counts up so message sends every 5 minutes
 
@@ -69,13 +70,14 @@ public class LiteModMobCounter implements Tickable, ChatFilter, OutboundChatList
 	}
 
 	@Override
-	public String getVersion() { return "1.0.3"; }
+	public String getVersion() { return "1.1.0"; }
 
 	@Override
 	public void init(File configPath)
 	{
 		this.sentCmd = false;
 		this.showChildCounts = false;
+		this.notifyFac = false;
 		this.sound = "note.bass";
 
 		counterKeyBinding = new KeyBinding("key.counter.toggle", Keyboard.KEY_P, "key.categories.litemods");
@@ -89,7 +91,9 @@ public class LiteModMobCounter implements Tickable, ChatFilter, OutboundChatList
 			LiteLoader.getInput().registerKeyBinding(optionsKeyBinding);
 
 		if (this.rebel) { // EEEEEEEEEEEEEEEbel
-			//			this.hostileVisible = 1;
+			this.notifyFac = true;
+			this.hostileVisible = 1;
+			this.counter.setXP5(true);
 		}
 	}
 
@@ -147,52 +151,96 @@ public class LiteModMobCounter implements Tickable, ChatFilter, OutboundChatList
 		if (tokens[0].equalsIgnoreCase("/counter") || tokens[0].equalsIgnoreCase("/count"))
 		{
 			this.sentCmd = true;
-			if (tokens.length > 1)
+			if (tokens.length < 2)
 			{
-				if (tokens[1].equalsIgnoreCase("message") || tokens[1].equalsIgnoreCase("m")
-						|| tokens[1].equalsIgnoreCase("msg"))
+				this.logMessage(this.getName() + " [v" + this.getVersion() + "] by Kyzeragon");
+				this.logMessage("Type /counter help for commands.");
+				return;
+			}
+			if (tokens[1].equalsIgnoreCase("message") || tokens[1].equalsIgnoreCase("m")
+					|| tokens[1].equalsIgnoreCase("msg"))
+			{
+				if (tokens.length < 3)
 				{
-					if (tokens.length < 3)
+					String toSend = "Currently notifying: ";
+					for (String name : this.toMessage)
+						toSend += name + " ";
+					this.logMessage(toSend);
+				}
+				else if (tokens.length > 3)
+					this.logError("Too many args! Usage: /counter msg clear OR /counter msg [player1[,player2]]]");
+				else if (tokens[2].equalsIgnoreCase("clear"))
+				{
+					this.toMessage = null;
+					this.logMessage("Not currently notifying any players.");
+				}
+				else
+				{
+					this.toMessage = tokens[2].split(",");
+					String toSend = tokens[2].replaceAll(",", " ");
+					this.logMessage("Now notifying: " + toSend);
+					this.logError("Usage: /counter msg clear OR /counter msg <player[,player2]>");
+				}
+			}
+			else if (tokens[1].equalsIgnoreCase("sound"))
+			{
+				if (tokens.length < 3)
+					this.logMessage("Current hostile sound: " + this.sound);
+				else if (tokens.length > 3)
+					this.logError("Too many args! Usage: /counter sound <sound file>");
+				else
+				{
+					this.sound = tokens[2];
+					this.logMessage("Now using " + this.sound + " as notification sound.");
+				}
+			}
+			else if (tokens[1].matches("fac|faction"))
+			{
+				if (tokens.length > 2)
+				{
+					if (tokens[2].equalsIgnoreCase("on"))
 					{
-						String toSend = "Currently notifying: ";
-						for (String name : this.toMessage)
-							toSend += name + " ";
-						this.logMessage(toSend);
+						this.notifyFac = true;
+						this.logMessage("Now notifying in faction chat when over 150 mobs.");
 					}
-					else if (tokens.length > 3)
-						this.logError("Too many args! Usage: /counter msg [player1[,player2]]]");
+					else if (tokens[2].equalsIgnoreCase("off"))
+					{
+						this.notifyFac = false;
+						this.logMessage("Not notifying in faction chat.");
+					}
 					else
+						this.logError("Usage: /counter fac <on|off>");
+				}
+			}
+			else if (tokens[1].equalsIgnoreCase("xp5") && this.staff)
+			{
+				if (tokens.length > 2)
+				{
+					if (tokens[2].equalsIgnoreCase("on"))
 					{
-						this.toMessage = tokens[2].split(",");
-						String toSend = tokens[2].replaceAll(",", " ");
-						this.logMessage("Now notifying: " + toSend);
+						this.counter.setXP5(true);
+						this.logMessage("Now counting only mobs at ShockerzXP5 kill points... mostly.");
+						return;
+					}
+					else if (tokens[2].equalsIgnoreCase("off"))
+					{
+						this.counter.setXP5(false);
+						this.logMessage("Using normal mob counter radius.");
+						return;
 					}
 				}
-				else if (tokens[1].equalsIgnoreCase("sound"))
-				{
-					if (tokens.length < 3)
-						this.logMessage("Current hostile sound: " + this.sound);
-					else if (tokens.length > 3)
-						this.logError("Too many args! Usage: /counter sound <sound file>");
-					else
-					{
-						this.sound = tokens[2];
-						this.logMessage("Now using " + this.sound + " as notification sound.");
-					}
-				}
-				else if (tokens[1].equalsIgnoreCase("help"))
-				{
-					String[] commands = {"msg [player1[,player2]] - Set notified players",
-							"sound [sound file] - Set the notification sound.",
-							"help - This help message. Hurrdurr."};
-					this.logMessage(this.getName() + " [v" + this.getVersion() + "] commands");
-					for (String command : commands)
-						this.logMessage("/counter " + command);
-				}
-				else {
-					this.logMessage(this.getName() + " [v" + this.getVersion() + "]");
-					this.logMessage("Type /counter help for commands.");
-				}
+				this.logError("Usage: /sd xp5 <on|off>");
+			}
+			else if (tokens[1].equalsIgnoreCase("help"))
+			{
+				String[] commands = {"msg [player1[,player2]] - Set notified players",
+						"msg clear - Clear the list of notfied players",
+						"fac|faction <on|off> - Toggle notification in faction chat.",
+						"sound [sound file] - Set the notification sound.",
+				"help - This help message. Hurrdurr."};
+				this.logMessage(this.getName() + " [v" + this.getVersion() + "] commands");
+				for (String command : commands)
+					this.logMessage("/counter " + command);
 			}
 			else {
 				this.logMessage(this.getName() + " [v" + this.getVersion() + "]");
@@ -221,7 +269,7 @@ public class LiteModMobCounter implements Tickable, ChatFilter, OutboundChatList
 	 */
 	private void hostileLimit()
 	{
-//		System.out.println("playSoundCount: " + this.playSoundCount + " sendMsgCount: " + this.sendMsgCount);
+		//		System.out.println("playSoundCount: " + this.playSoundCount + " sendMsgCount: " + this.sendMsgCount);
 		int totalCount = 0;
 		for (int i = 0; i < 8; i++)
 			totalCount += this.counter.countEntity(i + 8, true);
@@ -242,14 +290,14 @@ public class LiteModMobCounter implements Tickable, ChatFilter, OutboundChatList
 
 			if (this.sendMsgCount == 0)
 			{
-				if (this.rebel)
+				if (this.notifyFac)
 					Minecraft.getMinecraft().thePlayer.sendChatMessage("/ch qm f Automated Message: "
 							+ totalCount + " mobz. Kill pl0x.");
 				if (this.toMessage != null && this.toMessage.length > 0)
 				{
 					for (String player : this.toMessage)
 						Minecraft.getMinecraft().thePlayer.sendChatMessage("/m " + player 
-								+ " Automated Message: Kill mobz pl0x.");
+								+ " Automated Message: " + totalCount + " mobz. Kill pl0x.");
 				}
 				this.sendMsgCount++;
 			}
@@ -356,8 +404,15 @@ public class LiteModMobCounter implements Tickable, ChatFilter, OutboundChatList
 		if (this.counterVisible > 0)
 			offset = 50;
 
-		this.counter.updateHostileBB();
-		fontRender.drawStringWithShadow("Radius: " + this.counter.getHRadius(), 0, offset, 0xFFAA00);
+		if (this.counter.getXP5())
+		{
+			fontRender.drawStringWithShadow("ShockerzXP5", 0, offset, 0xFFAA00);
+		}
+		else
+		{
+			this.counter.updateHostileBB();
+			fontRender.drawStringWithShadow("Radius: " + this.counter.getHRadius(), 0, offset, 0xFFAA00);
+		}
 
 		int totalCount = 0;
 		for (int i = 0; i < 4; i++)
@@ -380,14 +435,17 @@ public class LiteModMobCounter implements Tickable, ChatFilter, OutboundChatList
 		}
 		else
 			this.playSoundCount = 100;
-		fontRender.drawStringWithShadow("Total: " + totalCount, 60, offset, color);
+		if (this.counter.getXP5())
+			fontRender.drawStringWithShadow("Total: " + totalCount, 70, offset, color);
+		else
+			fontRender.drawStringWithShadow("Total: " + totalCount, 60, offset, color);
 	}
 
 	/**
 	 * Logs the message to the user
 	 * @param message The message to log
 	 */
-	private void logMessage(String message)
+	public static void logMessage(String message)
 	{
 		ChatComponentText displayMessage = new ChatComponentText(message);
 		displayMessage.setChatStyle((new ChatStyle()).setColor(EnumChatFormatting.AQUA));
@@ -398,9 +456,9 @@ public class LiteModMobCounter implements Tickable, ChatFilter, OutboundChatList
 	 * Logs the error message to the user
 	 * @param message The error message to log
 	 */
-	private void logError(String message)
+	public static void logError(String message)
 	{
-		ChatComponentText displayMessage = new ChatComponentText(message);
+		ChatComponentText displayMessage = new ChatComponentText("§8[§4!§8] §c" + message + " §8[§4!§8]");
 		displayMessage.setChatStyle((new ChatStyle()).setColor(EnumChatFormatting.RED));
 		Minecraft.getMinecraft().thePlayer.addChatComponentMessage(displayMessage);
 	}

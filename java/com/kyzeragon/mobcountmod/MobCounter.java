@@ -16,18 +16,20 @@ import net.minecraft.world.World;
 public class MobCounter {
 
 	private int radius;
+	private boolean xp5;
 	private AxisAlignedBB boundingBox;
 	private int hRadius; //radius for hostiles
 	private AxisAlignedBB hostileBB;
 
 	public MobCounter(boolean isStaff)
 	{
+		this.xp5 = false;
 		this.radius = 16;
 		if (isStaff)
 			this.hRadius = 25;
 		else
 			this.hRadius = 16;
-		
+
 		this.boundingBox = AxisAlignedBB.getBoundingBox(0, 0, 0, 0, 0, 0);
 		this.hostileBB = AxisAlignedBB.getBoundingBox(0, 0, 0, 0, 0, 0);
 	}
@@ -55,7 +57,7 @@ public class MobCounter {
 		case 13: return minecraft.theWorld.getEntitiesWithinAABB(EntityWitch.class, hostileBB).size();
 		case 14: return minecraft.theWorld.getEntitiesWithinAABB(EntityPigZombie.class, hostileBB).size();
 		case 15: return minecraft.theWorld.getEntitiesWithinAABB(EntitySlime.class, hostileBB).size();
-		
+
 		case 16: return minecraft.theWorld.getEntitiesWithinAABB(EntityPlayer.class, boundingBox).size() - 1;
 		}
 		if (adult)
@@ -71,21 +73,21 @@ public class MobCounter {
 			return count;
 		}
 	}
-	
+
 	public void updateBB()
 	{
 		EntityPlayer player = Minecraft.getMinecraft().thePlayer;
 		this.boundingBox.setBounds(player.posX - this.radius, player.posY - this.radius, player.posZ - this.radius, 
 				player.posX + this.radius, player.posY + this.radius, player.posZ + this.radius);
 	}
-	
+
 	public void updateHostileBB()
 	{
 		EntityPlayer player = Minecraft.getMinecraft().thePlayer;
 		this.hostileBB.setBounds(player.posX - this.hRadius, player.posY - this.hRadius, player.posZ - this.hRadius, 
 				player.posX + this.hRadius, player.posY + this.hRadius, player.posZ + this.hRadius);
 	}
-	
+
 	public int getRadius() 
 	{
 		return this.radius;
@@ -108,12 +110,12 @@ public class MobCounter {
 		if (this.radius > 0)
 			this.radius--;
 	}
-	
+
 	public int getHRadius()
 	{
 		return this.hRadius;
 	}
-	
+
 	public void increaseHRadius(boolean staff)
 	{
 		if (staff)
@@ -125,11 +127,24 @@ public class MobCounter {
 				this.hRadius++;
 		}
 	}
-	
+
 	public void decreaseHRadius()
 	{
 		if (this.hRadius > 0)
 			this.hRadius--;
 	}
 
+	public boolean getXP5() { return this.xp5; }
+
+	public void setXP5(boolean on) 
+	{ 
+		this.xp5 = on;
+		if (on)
+			this.setXP5bounding();
+	}
+
+	private void setXP5bounding()
+	{
+		this.hostileBB.setBounds(-2290, 5, -4363, -2270, 34, -4357);
+	}
 }
