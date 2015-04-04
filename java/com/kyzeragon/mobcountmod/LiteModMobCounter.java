@@ -31,7 +31,7 @@ import com.mumfrey.liteloader.modconfig.ExposableOptions;
 @ExposableOptions(strategy = ConfigStrategy.Versioned, filename="mobcountermod.json")
 public class LiteModMobCounter implements Tickable, ChatFilter, OutboundChatListener
 {
-	private static final boolean staff = true;
+	private static final boolean staff = false;
 	private static final boolean useOptions = false;
 	private static final boolean rebel = false;
 	private static KeyBinding counterKeyBinding;
@@ -70,7 +70,7 @@ public class LiteModMobCounter implements Tickable, ChatFilter, OutboundChatList
 	}
 
 	@Override
-	public String getVersion() { return "1.1.0"; }
+	public String getVersion() { return "1.1.1"; }
 
 	@Override
 	public void init(File configPath)
@@ -144,17 +144,18 @@ public class LiteModMobCounter implements Tickable, ChatFilter, OutboundChatList
 	/**
 	 * Client side commands
 	 */
+	@SuppressWarnings("unused")
 	@Override
 	public void onSendChatMessage(C01PacketChatMessage packet, String message)
 	{
 		String[] tokens = message.split(" ");
-		if (tokens[0].equalsIgnoreCase("/counter") || tokens[0].equalsIgnoreCase("/count"))
+		if (tokens[0].equalsIgnoreCase("/counter"))
 		{
 			this.sentCmd = true;
 			if (tokens.length < 2)
 			{
-				this.logMessage(this.getName() + " [v" + this.getVersion() + "] by Kyzeragon");
-				this.logMessage("Type /counter help for commands.");
+				this.logMessage("§2" + this.getName() + " §8[§2v" + this.getVersion() + "§8] §aby Kyzeragon", false);
+				this.logMessage("Type §2/counter help §afor commands.", false);
 				return;
 			}
 			if (tokens[1].equalsIgnoreCase("message") || tokens[1].equalsIgnoreCase("m")
@@ -162,36 +163,40 @@ public class LiteModMobCounter implements Tickable, ChatFilter, OutboundChatList
 			{
 				if (tokens.length < 3)
 				{
+					if (this.toMessage == null)
+					{
+						this.logMessage("Not currently notifying any players.", true);
+						return;
+					}
 					String toSend = "Currently notifying: ";
 					for (String name : this.toMessage)
 						toSend += name + " ";
-					this.logMessage(toSend);
+					this.logMessage(toSend, true);
 				}
 				else if (tokens.length > 3)
 					this.logError("Too many args! Usage: /counter msg clear OR /counter msg [player1[,player2]]]");
 				else if (tokens[2].equalsIgnoreCase("clear"))
 				{
 					this.toMessage = null;
-					this.logMessage("Not currently notifying any players.");
+					this.logMessage("Not currently notifying any players.", true);
 				}
 				else
 				{
 					this.toMessage = tokens[2].split(",");
 					String toSend = tokens[2].replaceAll(",", " ");
-					this.logMessage("Now notifying: " + toSend);
-					this.logError("Usage: /counter msg clear OR /counter msg <player[,player2]>");
+					this.logMessage("Now notifying: " + toSend, true);
 				}
 			}
 			else if (tokens[1].equalsIgnoreCase("sound"))
 			{
 				if (tokens.length < 3)
-					this.logMessage("Current hostile sound: " + this.sound);
+					this.logMessage("Current hostile sound: " + this.sound, true);
 				else if (tokens.length > 3)
 					this.logError("Too many args! Usage: /counter sound <sound file>");
 				else
 				{
 					this.sound = tokens[2];
-					this.logMessage("Now using " + this.sound + " as notification sound.");
+					this.logMessage("Now using " + this.sound + " as notification sound.", true);
 				}
 			}
 			else if (tokens[1].matches("fac|faction"))
@@ -201,16 +206,20 @@ public class LiteModMobCounter implements Tickable, ChatFilter, OutboundChatList
 					if (tokens[2].equalsIgnoreCase("on"))
 					{
 						this.notifyFac = true;
-						this.logMessage("Now notifying in faction chat when over 150 mobs.");
+						this.logMessage("Now notifying in faction chat when over 150 mobs.", true);
 					}
 					else if (tokens[2].equalsIgnoreCase("off"))
 					{
 						this.notifyFac = false;
-						this.logMessage("Not notifying in faction chat.");
+						this.logMessage("Not notifying in faction chat.", true);
 					}
 					else
 						this.logError("Usage: /counter fac <on|off>");
 				}
+				else if (this.notifyFac)
+					this.logMessage("Currently notifying faction chat.", true);
+				else
+					this.logMessage("Currently not notifying faction chat.", true);
 			}
 			else if (tokens[1].equalsIgnoreCase("xp5") && this.staff)
 			{
@@ -219,13 +228,13 @@ public class LiteModMobCounter implements Tickable, ChatFilter, OutboundChatList
 					if (tokens[2].equalsIgnoreCase("on"))
 					{
 						this.counter.setXP5(true);
-						this.logMessage("Now counting only mobs at ShockerzXP5 kill points... mostly.");
+						this.logMessage("Now counting only mobs at ShockerzXP5 kill points... mostly.", true);
 						return;
 					}
 					else if (tokens[2].equalsIgnoreCase("off"))
 					{
 						this.counter.setXP5(false);
-						this.logMessage("Using normal mob counter radius.");
+						this.logMessage("Using normal mob counter radius.", true);
 						return;
 					}
 				}
@@ -233,18 +242,18 @@ public class LiteModMobCounter implements Tickable, ChatFilter, OutboundChatList
 			}
 			else if (tokens[1].equalsIgnoreCase("help"))
 			{
-				String[] commands = {"msg [player1[,player2]] - Set notified players",
-						"msg clear - Clear the list of notfied players",
-						"fac|faction <on|off> - Toggle notification in faction chat.",
-						"sound [sound file] - Set the notification sound.",
-				"help - This help message. Hurrdurr."};
-				this.logMessage(this.getName() + " [v" + this.getVersion() + "] commands");
+				String[] commands = {"msg [player1[,player2]] §7- §aSet notified players",
+						"msg clear §7- §aClear the list of notfied players",
+						"fac|faction <on|off> §7- §aToggle notification in faction chat.",
+						"sound [sound file] §7- §aSet the notification sound.",
+				"help §7- §aThis help message. Hurrdurr."};
+				this.logMessage("§2" + this.getName() + " §8[§2v" + this.getVersion() + "§8] §acommands", false);
 				for (String command : commands)
-					this.logMessage("/counter " + command);
+					this.logMessage("/counter " + command, false);
 			}
 			else {
-				this.logMessage(this.getName() + " [v" + this.getVersion() + "]");
-				this.logMessage("Type /counter help for commands.");
+				this.logMessage(this.getName() + " [v" + this.getVersion() + "]", false);
+				this.logMessage("Type /counter help for commands.", false);
 			}
 		}
 	}
@@ -445,10 +454,12 @@ public class LiteModMobCounter implements Tickable, ChatFilter, OutboundChatList
 	 * Logs the message to the user
 	 * @param message The message to log
 	 */
-	public static void logMessage(String message)
+	public static void logMessage(String message, boolean usePrefix)
 	{
+		if (usePrefix)
+			message = "§8[§2MobCounter§8] §a" + message;
 		ChatComponentText displayMessage = new ChatComponentText(message);
-		displayMessage.setChatStyle((new ChatStyle()).setColor(EnumChatFormatting.AQUA));
+		displayMessage.setChatStyle((new ChatStyle()).setColor(EnumChatFormatting.GREEN));
 		Minecraft.getMinecraft().thePlayer.addChatComponentMessage(displayMessage);
 	}
 
