@@ -70,7 +70,7 @@ public class LiteModMobCounter implements Tickable, ChatFilter, OutboundChatList
 	}
 
 	@Override
-	public String getVersion() { return "1.1.2"; }
+	public String getVersion() { return "1.1.3"; }
 
 	@Override
 	public void init(File configPath)

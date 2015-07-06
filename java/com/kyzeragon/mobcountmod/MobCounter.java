@@ -145,6 +145,6 @@ public class MobCounter {
 
 	private void setXP5bounding()
 	{
-		this.hostileBB.setBounds(5389, 5, -4860, 5410, 34, -4852);
+		this.hostileBB.setBounds(5229, 5, -4700, 5250, 34, -4692);
 	}
 }
