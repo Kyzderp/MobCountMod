@@ -34,44 +34,34 @@ public class MobCounter {
 		this.hostileBB = AxisAlignedBB.getBoundingBox(0, 0, 0, 0, 0, 0);
 	}
 
-	public int countEntity(int num, boolean adult)
+	public int countEntity(int num)
 	{
 		Minecraft minecraft = Minecraft.getMinecraft();
-		List result = new ArrayList();
 		switch (num)
 		{
-		case 0: result = minecraft.theWorld.getEntitiesWithinAABB(EntityChicken.class, boundingBox); break;
-		case 1: result = minecraft.theWorld.getEntitiesWithinAABB(EntityPig.class, boundingBox); break;
-		case 2: result = minecraft.theWorld.getEntitiesWithinAABB(EntitySheep.class, boundingBox); break;
-		case 3: result = minecraft.theWorld.getEntitiesWithinAABB(EntityCow.class, boundingBox); break;
-		case 4: result = minecraft.theWorld.getEntitiesWithinAABB(EntityHorse.class, boundingBox); break;
-		case 5: result = minecraft.theWorld.getEntitiesWithinAABB(EntityMooshroom.class, boundingBox); break;
-		case 6: result = minecraft.theWorld.getEntitiesWithinAABB(EntityOcelot.class, boundingBox); break;
-		case 7: result = minecraft.theWorld.getEntitiesWithinAABB(EntityWolf.class, boundingBox); break;
+		case 0: return minecraft.theWorld.getEntitiesWithinAABB(EntityChicken.class, boundingBox).size();
+		case 1: return minecraft.theWorld.getEntitiesWithinAABB(EntityPig.class, boundingBox).size();
+		case 2: return minecraft.theWorld.getEntitiesWithinAABB(EntitySheep.class, boundingBox).size();
+		case 3: return minecraft.theWorld.getEntitiesWithinAABB(EntityCow.class, boundingBox).size() - this.countEntity(5);
+		case 4: return minecraft.theWorld.getEntitiesWithinAABB(EntityHorse.class, boundingBox).size();
+		case 5: return minecraft.theWorld.getEntitiesWithinAABB(EntityMooshroom.class, boundingBox).size();
+		case 6: return minecraft.theWorld.getEntitiesWithinAABB(EntityOcelot.class, boundingBox).size();
+		case 7: return minecraft.theWorld.getEntitiesWithinAABB(EntityWolf.class, boundingBox).size();
 
-		case 8: return (minecraft.theWorld.getEntitiesWithinAABB(EntityZombie.class, hostileBB).size() - this.countEntity(14, true));
+		case 8: return (minecraft.theWorld.getEntitiesWithinAABB(EntityZombie.class, hostileBB).size() - this.countEntity(14));
 		case 9: return minecraft.theWorld.getEntitiesWithinAABB(EntityCaveSpider.class, hostileBB).size();
 		case 10: return minecraft.theWorld.getEntitiesWithinAABB(EntitySkeleton.class, hostileBB).size();
-		case 11: return (minecraft.theWorld.getEntitiesWithinAABB(EntitySpider.class, hostileBB).size() - this.countEntity(9, true));
+		case 11: return (minecraft.theWorld.getEntitiesWithinAABB(EntitySpider.class, hostileBB).size() - this.countEntity(9));
 		case 12: return minecraft.theWorld.getEntitiesWithinAABB(EntityCreeper.class, hostileBB).size();
 		case 13: return minecraft.theWorld.getEntitiesWithinAABB(EntityWitch.class, hostileBB).size();
 		case 14: return minecraft.theWorld.getEntitiesWithinAABB(EntityPigZombie.class, hostileBB).size();
 		case 15: return minecraft.theWorld.getEntitiesWithinAABB(EntitySlime.class, hostileBB).size();
 
 		case 16: return minecraft.theWorld.getEntitiesWithinAABB(EntityPlayer.class, boundingBox).size() - 1;
+		case 17: return minecraft.theWorld.getEntitiesWithinAABB(EntityIronGolem.class, boundingBox).size();
+		case 18: return minecraft.theWorld.getEntitiesWithinAABB(EntitySnowman.class, boundingBox).size();
 		}
-		if (adult)
-		{
-			return result.size() - this.countEntity(num, false);
-		} else {
-			int count = 0;
-			for (Object mob: result)
-			{
-				if (((EntityAgeable)mob).isChild())
-					count++;
-			}
-			return count;
-		}
+		return 0;
 	}
 
 	public void updateBB()

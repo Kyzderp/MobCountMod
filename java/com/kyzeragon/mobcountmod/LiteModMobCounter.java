@@ -38,7 +38,6 @@ public class LiteModMobCounter implements Tickable, ChatFilter, OutboundChatList
 	private static KeyBinding hostileKeyBinding;
 	private static KeyBinding optionsKeyBinding;
 
-	private boolean showChildCounts;
 	private boolean sentCmd;
 	private MobCounterConfigScreen configScreen = new MobCounterConfigScreen();
 	private MobCounter counter = new MobCounter(staff);
@@ -70,13 +69,12 @@ public class LiteModMobCounter implements Tickable, ChatFilter, OutboundChatList
 	}
 
 	@Override
-	public String getVersion() { return "1.1.3"; }
+	public String getVersion() { return "1.1.4"; }
 
 	@Override
 	public void init(File configPath)
 	{
 		this.sentCmd = false;
-		this.showChildCounts = false;
 		this.notifyFac = false;
 		this.sound = "note.bass";
 
@@ -278,10 +276,9 @@ public class LiteModMobCounter implements Tickable, ChatFilter, OutboundChatList
 	 */
 	private void hostileLimit()
 	{
-		//		System.out.println("playSoundCount: " + this.playSoundCount + " sendMsgCount: " + this.sendMsgCount);
 		int totalCount = 0;
 		for (int i = 0; i < 8; i++)
-			totalCount += this.counter.countEntity(i + 8, true);
+			totalCount += this.counter.countEntity(i + 8);
 		if (this.playSoundCount != 0)
 			this.playSoundCount++;
 		if (this.sendMsgCount != 0)
@@ -363,17 +360,21 @@ public class LiteModMobCounter implements Tickable, ChatFilter, OutboundChatList
 		FontRenderer fontRender = Minecraft.getMinecraft().fontRenderer;
 		this.counter.updateBB();
 		fontRender.drawStringWithShadow("Radius: " + this.counter.getRadius(), 0, 0, 0xFFAA00);
-		if (staff) 
-			fontRender.drawStringWithShadow("Players: " + this.counter.countEntity(16, true), 60, 0, 0xFFFFFF);
+		if (staff)
+		{
+			fontRender.drawStringWithShadow("Players: " + this.counter.countEntity(16), 60, 0, 0xFFFFFF);
+			int color = 0xFFFFFF;
+			int count = this.counter.countEntity(18);
+			if (count > 16) color = 0xAA0000;
+			fontRender.drawStringWithShadow("Snowmen: " + count, 0, 50, color);
+		}
 		String toDisplay;
 
 		int color = 0xFFFFFF;
 		for (int i = 0; i < 4; i++)
 		{
-			int count = this.counter.countEntity(i, true) + this.counter.countEntity(i, false);
+			int count = this.counter.countEntity(i);
 			toDisplay = "" + count;
-			if (this.showChildCounts)
-				toDisplay = this.counter.countEntity(i, false) + "/" + this.counter.countEntity(i, true);
 			if (count > 16) color = 0xAA0000;
 			fontRender.drawStringWithShadow(this.passives[i] + toDisplay, 0, i * 10 + 10, color);
 			color = 0xFFFFFF;
@@ -385,21 +386,25 @@ public class LiteModMobCounter implements Tickable, ChatFilter, OutboundChatList
 	 */
 	private void displayPassiveExpanded()
 	{
+		FontRenderer fontRender = Minecraft.getMinecraft().fontRenderer;
 		for (int i = 4; i < 8; i++)
 		{
-			FontRenderer fontRender = Minecraft.getMinecraft().fontRenderer;
 			int color = 0xFFFFFF;
-			int count = this.counter.countEntity(i, true) + this.counter.countEntity(i, false);
+			int count = this.counter.countEntity(i);
 			String toDisplay = "" + count;
 			int x = 70;
-			if (this.showChildCounts)
-			{
-				toDisplay = this.counter.countEntity(i, false) + "/" + this.counter.countEntity(i, true);
-				x = 80;
-			}
+
 			if (count > 16) color = 0xAA0000;
 			fontRender.drawStringWithShadow(this.passives[i] + toDisplay, x, i * 10 - 30, color);
 			color = 0xFFFFFF;
+		}
+		
+		if (this.staff)
+		{
+			int color = 0xFFFFFF;
+			int count = this.counter.countEntity(17);
+			if (count > 16) color = 0xAA0000;
+			fontRender.drawStringWithShadow("Golems: " + count, 70, 50, color);
 		}
 	}
 
@@ -412,6 +417,8 @@ public class LiteModMobCounter implements Tickable, ChatFilter, OutboundChatList
 		int offset = 0;
 		if (this.counterVisible > 0)
 			offset = 50;
+		if (this.staff)
+			offset += 10;
 
 		if (this.counter.getXP5())
 		{
@@ -426,24 +433,23 @@ public class LiteModMobCounter implements Tickable, ChatFilter, OutboundChatList
 		int totalCount = 0;
 		for (int i = 0; i < 4; i++)
 		{
-			int count = this.counter.countEntity(i + 8, true);
+			int count = this.counter.countEntity(i + 8);
 			totalCount += count;
 			fontRender.drawStringWithShadow(this.hostiles[i] + count, 0, i * 10 + 10 + offset, 0xFFFFFF);
 		}
 		for (int i = 4; i < 8; i++) 
 		{
-			int count = this.counter.countEntity(i + 8, true);
+			int count = this.counter.countEntity(i + 8);
 			totalCount += count;
 			if (this.hostileVisible > 1)
 				fontRender.drawStringWithShadow(this.hostiles[i] + count, 90, i * 10 - 30 + offset, 0xFFFFFF);
 		}
 		int color = 0xFFFFFF;
 		if (totalCount > 149) // if 150+ mobs, display in red.
-		{
 			color = 0xAA0000;
-		}
 		else
 			this.playSoundCount = 100;
+		
 		if (this.counter.getXP5())
 			fontRender.drawStringWithShadow("Total: " + totalCount, 70, offset, color);
 		else

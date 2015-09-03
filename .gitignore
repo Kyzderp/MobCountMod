@@ -46,3 +46,4 @@ Temporary Items
 *.class
 *.class
 bin/com/kyzeragon/mobcountmod/LiteModMobCounter.class
+*.class
