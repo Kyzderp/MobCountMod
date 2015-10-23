@@ -13,17 +13,17 @@
 <!-- The file is well commented and you should have a read through this script before making     -->
 <!-- changes to ensure that you know how it works.                                               -->
 
-<project name="mobcounter" basedir="." default="main">
+<project name="mobcounter_staff" basedir="." default="main">
 
 	<!-- The version of your mod, can be any string as long as it's valid as part of a file name -->
 	<!-- and should match the version string returned by your mod.                               -->
-	<property name="version"        value="1.1.4" />
+	<property name="version"        value="1.2.0" />
 		
 	<!-- The Minecraft version the mod is for, appended to the output file name for reference -->
-	<property name="mcversion"      value="1.7.2" />
+	<property name="mcversion"      value="1.8" />
 		
 	<!-- The version inserted into the mod metadata to tell the loader what version of MC this mod is for -->
-	<property name="litemodversion" value="1.7.2_02" />
+	<property name="litemodversion" value="1.8" />
 		
 	<!-- Your name, this gets written into the mod metadata and jar metadata -->
 	<property name="author"         value="Kyzeragon" />

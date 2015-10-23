@@ -1,4 +1,4 @@
-package com.kyzeragon.mobcountmod;
+package io.github.kyzderp.mobcountmod;
 
 /**
  * Configuration screen for Mob Counter mod

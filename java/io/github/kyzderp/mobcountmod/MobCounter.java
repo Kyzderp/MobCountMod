@@ -1,4 +1,4 @@
-package com.kyzeragon.mobcountmod;
+package io.github.kyzderp.mobcountmod;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,8 +30,8 @@ public class MobCounter {
 		else
 			this.hRadius = 16;
 
-		this.boundingBox = AxisAlignedBB.getBoundingBox(0, 0, 0, 0, 0, 0);
-		this.hostileBB = AxisAlignedBB.getBoundingBox(0, 0, 0, 0, 0, 0);
+		this.boundingBox = AxisAlignedBB.fromBounds(0, 0, 0, 0, 0, 0);
+		this.hostileBB = AxisAlignedBB.fromBounds(0, 0, 0, 0, 0, 0);
 	}
 
 	public int countEntity(int num)
@@ -45,7 +45,7 @@ public class MobCounter {
 		case 3: return minecraft.theWorld.getEntitiesWithinAABB(EntityCow.class, boundingBox).size() - this.countEntity(5);
 		case 4: return minecraft.theWorld.getEntitiesWithinAABB(EntityHorse.class, boundingBox).size();
 		case 5: return minecraft.theWorld.getEntitiesWithinAABB(EntityMooshroom.class, boundingBox).size();
-		case 6: return minecraft.theWorld.getEntitiesWithinAABB(EntityOcelot.class, boundingBox).size();
+		case 6: return minecraft.theWorld.getEntitiesWithinAABB(EntityRabbit.class, boundingBox).size();
 		case 7: return minecraft.theWorld.getEntitiesWithinAABB(EntityWolf.class, boundingBox).size();
 
 		case 8: return (minecraft.theWorld.getEntitiesWithinAABB(EntityZombie.class, hostileBB).size() - this.countEntity(14));
@@ -67,14 +67,14 @@ public class MobCounter {
 	public void updateBB()
 	{
 		EntityPlayer player = Minecraft.getMinecraft().thePlayer;
-		this.boundingBox.setBounds(player.posX - this.radius, player.posY - this.radius, player.posZ - this.radius, 
+		this.boundingBox = this.boundingBox.fromBounds(player.posX - this.radius, player.posY - this.radius, player.posZ - this.radius, 
 				player.posX + this.radius, player.posY + this.radius, player.posZ + this.radius);
 	}
 
 	public void updateHostileBB()
 	{
 		EntityPlayer player = Minecraft.getMinecraft().thePlayer;
-		this.hostileBB.setBounds(player.posX - this.hRadius, player.posY - this.hRadius, player.posZ - this.hRadius, 
+		this.hostileBB = this.hostileBB.fromBounds(player.posX - this.hRadius, player.posY - this.hRadius, player.posZ - this.hRadius, 
 				player.posX + this.hRadius, player.posY + this.hRadius, player.posZ + this.hRadius);
 	}
 
@@ -135,6 +135,6 @@ public class MobCounter {
 
 	private void setXP5bounding()
 	{
-		this.hostileBB.setBounds(5229, 5, -4700, 5250, 34, -4692);
+		this.hostileBB.fromBounds(5229, 5, -4700, 5250, 34, -4692);
 	}
 }

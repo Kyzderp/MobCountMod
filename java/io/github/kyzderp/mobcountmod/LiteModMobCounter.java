@@ -1,4 +1,4 @@
-package com.kyzeragon.mobcountmod;
+package io.github.kyzderp.mobcountmod;
 
 import java.io.File;
 import java.util.List;
@@ -17,9 +17,11 @@ import net.minecraft.util.IChatComponent;
 import org.lwjgl.input.Keyboard;
 
 import com.mumfrey.liteloader.ChatFilter;
+import com.mumfrey.liteloader.OutboundChatFilter;
 import com.mumfrey.liteloader.OutboundChatListener;
 import com.mumfrey.liteloader.Tickable;
 import com.mumfrey.liteloader.core.LiteLoader;
+import com.mumfrey.liteloader.core.LiteLoaderEventBroker.ReturnValue;
 import com.mumfrey.liteloader.modconfig.ConfigStrategy;
 import com.mumfrey.liteloader.modconfig.ExposableOptions;
 
@@ -29,7 +31,7 @@ import com.mumfrey.liteloader.modconfig.ExposableOptions;
  * @author Kyzeragon
  */
 @ExposableOptions(strategy = ConfigStrategy.Versioned, filename="mobcountermod.json")
-public class LiteModMobCounter implements Tickable, ChatFilter, OutboundChatListener
+public class LiteModMobCounter implements Tickable, OutboundChatFilter
 {
 	private static final boolean staff = false;
 	private static final boolean useOptions = false;
@@ -38,7 +40,6 @@ public class LiteModMobCounter implements Tickable, ChatFilter, OutboundChatList
 	private static KeyBinding hostileKeyBinding;
 	private static KeyBinding optionsKeyBinding;
 
-	private boolean sentCmd;
 	private MobCounterConfigScreen configScreen = new MobCounterConfigScreen();
 	private MobCounter counter = new MobCounter(staff);
 	private String[] toMessage;
@@ -50,7 +51,7 @@ public class LiteModMobCounter implements Tickable, ChatFilter, OutboundChatList
 	private int playSoundCount = 0; // counts up so sound plays once per sec
 	private int sendMsgCount = 0; // counts up so message sends every 5 minutes
 
-	private String[] passives = {"Chickens: ", "Pigs: ", "Sheep: ", "Cows: ", "Horses: ", "Mooshrooms: ", "Ocelots: ", "Wolves: "};
+	private String[] passives = {"Chickens: ", "Pigs: ", "Sheep: ", "Cows: ", "Horses: ", "Mooshrooms: ", "Rabbits: ", "Wolves: "};
 	private String[] hostiles = {"Zombies: ", "CaveSpiders: ", "Skeletons: ", "Spiders: ", 
 			"Creepers: ", "Witches: ", "Pigmen: ", "Slimes: "};
 
@@ -69,12 +70,11 @@ public class LiteModMobCounter implements Tickable, ChatFilter, OutboundChatList
 	}
 
 	@Override
-	public String getVersion() { return "1.1.4"; }
+	public String getVersion() { return "1.2.0"; }
 
 	@Override
 	public void init(File configPath)
 	{
-		this.sentCmd = false;
 		this.notifyFac = false;
 		this.sound = "note.bass";
 
@@ -144,17 +144,16 @@ public class LiteModMobCounter implements Tickable, ChatFilter, OutboundChatList
 	 */
 	@SuppressWarnings("unused")
 	@Override
-	public void onSendChatMessage(C01PacketChatMessage packet, String message)
+	public boolean onSendChatMessage(String message)
 	{
 		String[] tokens = message.split(" ");
 		if (tokens[0].equalsIgnoreCase("/counter"))
 		{
-			this.sentCmd = true;
 			if (tokens.length < 2)
 			{
 				this.logMessage("§2" + this.getName() + " §8[§2v" + this.getVersion() + "§8] §aby Kyzeragon", false);
 				this.logMessage("Type §2/counter help §afor commands.", false);
-				return;
+				return false;
 			}
 			if (tokens[1].equalsIgnoreCase("message") || tokens[1].equalsIgnoreCase("m")
 					|| tokens[1].equalsIgnoreCase("msg"))
@@ -164,7 +163,7 @@ public class LiteModMobCounter implements Tickable, ChatFilter, OutboundChatList
 					if (this.toMessage == null)
 					{
 						this.logMessage("Not currently notifying any players.", true);
-						return;
+						return false;
 					}
 					String toSend = "Currently notifying: ";
 					for (String name : this.toMessage)
@@ -227,13 +226,11 @@ public class LiteModMobCounter implements Tickable, ChatFilter, OutboundChatList
 					{
 						this.counter.setXP5(true);
 						this.logMessage("Now counting only mobs at ShockerzXP5 kill points... mostly.", true);
-						return;
 					}
 					else if (tokens[2].equalsIgnoreCase("off"))
 					{
 						this.counter.setXP5(false);
 						this.logMessage("Using normal mob counter radius.", true);
-						return;
 					}
 				}
 				this.logError("Usage: /sd xp5 <on|off>");
@@ -253,19 +250,6 @@ public class LiteModMobCounter implements Tickable, ChatFilter, OutboundChatList
 				this.logMessage(this.getName() + " [v" + this.getVersion() + "]", false);
 				this.logMessage("Type /counter help for commands.", false);
 			}
-		}
-	}
-
-	/**
-	 * Stops the Unknown command error from the server from displaying
-	 */
-	@Override
-	public boolean onChat(S02PacketChat chatPacket, IChatComponent chat,
-			String message) {
-		if (message.matches(".*nknown.*ommand.*") && this.sentCmd)
-		{
-			this.sentCmd = false;
-			return false;
 		}
 		return true;
 	}
@@ -357,7 +341,7 @@ public class LiteModMobCounter implements Tickable, ChatFilter, OutboundChatList
 	 */
 	private void displayPassiveCompact()
 	{
-		FontRenderer fontRender = Minecraft.getMinecraft().fontRenderer;
+		FontRenderer fontRender = Minecraft.getMinecraft().fontRendererObj;
 		this.counter.updateBB();
 		fontRender.drawStringWithShadow("Radius: " + this.counter.getRadius(), 0, 0, 0xFFAA00);
 		if (staff)
@@ -386,7 +370,7 @@ public class LiteModMobCounter implements Tickable, ChatFilter, OutboundChatList
 	 */
 	private void displayPassiveExpanded()
 	{
-		FontRenderer fontRender = Minecraft.getMinecraft().fontRenderer;
+		FontRenderer fontRender = Minecraft.getMinecraft().fontRendererObj;
 		for (int i = 4; i < 8; i++)
 		{
 			int color = 0xFFFFFF;
@@ -413,7 +397,7 @@ public class LiteModMobCounter implements Tickable, ChatFilter, OutboundChatList
 	 */
 	private void displayHostile()
 	{
-		FontRenderer fontRender = Minecraft.getMinecraft().fontRenderer;
+		FontRenderer fontRender = Minecraft.getMinecraft().fontRendererObj;
 		int offset = 0;
 		if (this.counterVisible > 0)
 			offset = 50;
