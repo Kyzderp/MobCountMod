@@ -56,10 +56,12 @@ public class MobCounter {
 		case 13: return minecraft.theWorld.getEntitiesWithinAABB(EntityWitch.class, hostileBB).size();
 		case 14: return minecraft.theWorld.getEntitiesWithinAABB(EntityPigZombie.class, hostileBB).size();
 		case 15: return minecraft.theWorld.getEntitiesWithinAABB(EntitySlime.class, hostileBB).size();
+		case 16: return minecraft.theWorld.getEntitiesWithinAABB(EntityGuardian.class, hostileBB).size();
 
-		case 16: return minecraft.theWorld.getEntitiesWithinAABB(EntityPlayer.class, boundingBox).size() - 1;
 		case 17: return minecraft.theWorld.getEntitiesWithinAABB(EntityIronGolem.class, boundingBox).size();
 		case 18: return minecraft.theWorld.getEntitiesWithinAABB(EntitySnowman.class, boundingBox).size();
+		case 20: return minecraft.theWorld.getEntitiesWithinAABB(EntityPlayer.class, boundingBox).size() - 1;
+
 		}
 		return 0;
 	}
