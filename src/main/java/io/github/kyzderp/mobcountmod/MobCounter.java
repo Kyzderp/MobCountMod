@@ -1,17 +1,27 @@
 package io.github.kyzderp.mobcountmod;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import net.minecraft.client.Minecraft;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityAgeable;
-import net.minecraft.entity.item.EntityTNTPrimed;
-import net.minecraft.entity.monster.*;
-import net.minecraft.entity.passive.*;
+import net.minecraft.entity.monster.EntityCaveSpider;
+import net.minecraft.entity.monster.EntityCreeper;
+import net.minecraft.entity.monster.EntityGuardian;
+import net.minecraft.entity.monster.EntityIronGolem;
+import net.minecraft.entity.monster.EntityPigZombie;
+import net.minecraft.entity.monster.EntitySkeleton;
+import net.minecraft.entity.monster.EntitySlime;
+import net.minecraft.entity.monster.EntitySnowman;
+import net.minecraft.entity.monster.EntitySpider;
+import net.minecraft.entity.monster.EntityWitch;
+import net.minecraft.entity.monster.EntityZombie;
+import net.minecraft.entity.passive.EntityChicken;
+import net.minecraft.entity.passive.EntityCow;
+import net.minecraft.entity.passive.EntityHorse;
+import net.minecraft.entity.passive.EntityMooshroom;
+import net.minecraft.entity.passive.EntityPig;
+import net.minecraft.entity.passive.EntityRabbit;
+import net.minecraft.entity.passive.EntitySheep;
+import net.minecraft.entity.passive.EntityWolf;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.util.AxisAlignedBB;
-import net.minecraft.world.World;
+import net.minecraft.util.math.AxisAlignedBB;
 
 public class MobCounter {
 
@@ -30,8 +40,8 @@ public class MobCounter {
 		else
 			this.hRadius = 16;
 
-		this.boundingBox = AxisAlignedBB.fromBounds(0, 0, 0, 0, 0, 0);
-		this.hostileBB = AxisAlignedBB.fromBounds(0, 0, 0, 0, 0, 0);
+		this.boundingBox = new AxisAlignedBB(0, 0, 0, 0, 0, 0);
+		this.hostileBB = new AxisAlignedBB(0, 0, 0, 0, 0, 0);
 	}
 
 	public int countEntity(int num)
@@ -69,15 +79,18 @@ public class MobCounter {
 	public void updateBB()
 	{
 		EntityPlayer player = Minecraft.getMinecraft().thePlayer;
-		this.boundingBox = this.boundingBox.fromBounds(player.posX - this.radius, player.posY - this.radius, player.posZ - this.radius, 
+		this.boundingBox = new AxisAlignedBB(player.posX - this.radius, player.posY - this.radius, player.posZ - this.radius, 
 				player.posX + this.radius, player.posY + this.radius, player.posZ + this.radius);
 	}
 
 	public void updateHostileBB()
 	{
-		EntityPlayer player = Minecraft.getMinecraft().thePlayer;
-		this.hostileBB = this.hostileBB.fromBounds(player.posX - this.hRadius, player.posY - this.hRadius, player.posZ - this.hRadius, 
-				player.posX + this.hRadius, player.posY + this.hRadius, player.posZ + this.hRadius);
+		if (!this.xp5)
+		{
+			EntityPlayer player = Minecraft.getMinecraft().thePlayer;
+			this.hostileBB = new AxisAlignedBB(player.posX - this.hRadius, player.posY - this.hRadius, player.posZ - this.hRadius, 
+					player.posX + this.hRadius, player.posY + this.hRadius, player.posZ + this.hRadius);
+		}
 	}
 
 	public int getRadius() 
@@ -128,15 +141,15 @@ public class MobCounter {
 
 	public boolean getXP5() { return this.xp5; }
 
-	public void setXP5(boolean on) 
+	public void setXP5(boolean isOn) 
 	{ 
-		this.xp5 = on;
-		if (on)
+		this.xp5 = isOn;
+		if (isOn)
 			this.setXP5bounding();
 	}
 
 	private void setXP5bounding()
 	{
-		this.hostileBB.fromBounds(5229, 5, -4700, 5250, 34, -4692);
+		this.hostileBB = new AxisAlignedBB(5229, 5, -4700, 5250, 34, -4692);
 	}
 }

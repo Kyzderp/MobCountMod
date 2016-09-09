@@ -1,7 +1,0 @@
-{
-    "name": "${ant.project.name}",
-    "mcversion": "${litemodversion}",
-    "revision": "${build.number}",
-    "author": "${author}",
-    "description": "Simple LiteMod that displays entity counts for certain mobs within a specified radius"
-}
