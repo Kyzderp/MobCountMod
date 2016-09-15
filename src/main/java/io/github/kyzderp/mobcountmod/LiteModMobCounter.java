@@ -29,7 +29,7 @@ import com.mumfrey.liteloader.modconfig.ExposableOptions;
 @ExposableOptions(strategy = ConfigStrategy.Versioned, filename="mobcountermod.json")
 public class LiteModMobCounter implements Tickable, OutboundChatFilter
 {
-	private static final boolean staff = true;
+	private static final boolean staff = false;
 	private static final boolean rebel = false;
 	private static KeyBinding counterKeyBinding;
 	private static KeyBinding hostileKeyBinding;
@@ -64,7 +64,7 @@ public class LiteModMobCounter implements Tickable, OutboundChatFilter
 	}
 
 	@Override
-	public String getVersion() { return "1.3.0"; }
+	public String getVersion() { return "1.3.1"; }
 
 	@Override
 	public void init(File configPath)
