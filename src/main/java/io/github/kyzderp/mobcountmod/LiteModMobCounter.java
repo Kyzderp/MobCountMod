@@ -64,7 +64,7 @@ public class LiteModMobCounter implements Tickable, OutboundChatFilter
 	}
 
 	@Override
-	public String getVersion() { return "1.3.1"; }
+	public String getVersion() { return "1.4.0"; }
 
 	@Override
 	public void init(File configPath)
@@ -168,12 +168,12 @@ public class LiteModMobCounter implements Tickable, OutboundChatFilter
 			if (this.sendMsgCount == 0)
 			{
 				if (this.isNotifyFac())
-					Minecraft.getMinecraft().thePlayer.sendChatMessage("/ch qm f Automated Message: "
+					Minecraft.getMinecraft().player.sendChatMessage("/ch qm f Automated Message: "
 							+ totalCount + " mobz. Kill pl0x.");
 				if (this.getToMessage() != null && this.getToMessage().length > 0)
 				{
 					for (String player : this.getToMessage())
-						Minecraft.getMinecraft().thePlayer.sendChatMessage("/m " + player 
+						Minecraft.getMinecraft().player.sendChatMessage("/m " + player 
 								+ " Automated Message: " + totalCount + " mobz. Kill pl0x.");
 				}
 				this.sendMsgCount++;
@@ -347,7 +347,7 @@ public class LiteModMobCounter implements Tickable, OutboundChatFilter
 			message = "\u00A78[\u00A72MobCounter\u00A78] \u00A7a" + message;
 		TextComponentString displayMessage = new TextComponentString(message);
 		displayMessage.setStyle((new Style()).setColor(TextFormatting.GREEN));
-		Minecraft.getMinecraft().thePlayer.addChatComponentMessage(displayMessage);
+		Minecraft.getMinecraft().player.sendMessage(displayMessage);
 	}
 
 	/**
@@ -358,6 +358,6 @@ public class LiteModMobCounter implements Tickable, OutboundChatFilter
 	{
 		TextComponentString displayMessage = new TextComponentString("\u00A78[\u00A74!\u00A78] \u00A7c" + message + " \u00A78[\u00A74!\u00A78]");
 		displayMessage.setStyle((new Style()).setColor(TextFormatting.RED));
-		Minecraft.getMinecraft().thePlayer.addChatComponentMessage(displayMessage);
+		Minecraft.getMinecraft().player.sendMessage(displayMessage);
 	}
 }

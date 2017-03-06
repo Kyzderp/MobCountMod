@@ -11,7 +11,7 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="con" path="org.eclipse.buildship.core.gradleclasspathcontainer"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/jdk1.7.0_67"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6"/>
 	<classpathentry kind="lib" path="C:/Users/Amurtiger224/.gradle/caches/minecraft/deobfedDeps/deobf/com/mumfrey/liteloader/1.10.2-SNAPSHOT/liteloader-1.10.2-SNAPSHOT.jar" sourcepath="C:/Users/Amurtiger224/.gradle/caches/minecraft/deobfedDeps/deobf/com/mumfrey/liteloader/1.10.2-SNAPSHOT/liteloader-1.10.2-SNAPSHOT-sources.jar"/>
 	<classpathentry kind="lib" path="C:/Users/Amurtiger224/.gradle/caches/minecraft/net/minecraft/minecraft/1.10.2/snapshot/20160906/minecraftSrc-1.10.2.jar" sourcepath="C:/Users/Amurtiger224/.gradle/caches/minecraft/net/minecraft/minecraft/1.10.2/snapshot/20160906/minecraftSrc-1.10.2-sources.jar"/>
 	<classpathentry kind="lib" path="C:/Users/Amurtiger224/.gradle/caches/modules-2/files-2.1/com.mojang/netty/1.6/4b75825a06139752bd800d9e29c5fd55b8b1b1e4/netty-1.6.jar" sourcepath="C:/Users/Amurtiger224/.gradle/caches/modules-2/files-2.1/com.mojang/netty/1.6/cd01cc3788bac1b1eb9cf2cda02fc7698a5ca1cc/netty-1.6-sources.jar"/>

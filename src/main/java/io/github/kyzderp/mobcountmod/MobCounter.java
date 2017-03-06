@@ -49,28 +49,28 @@ public class MobCounter {
 		Minecraft minecraft = Minecraft.getMinecraft();
 		switch (num)
 		{
-		case 0: return minecraft.theWorld.getEntitiesWithinAABB(EntityChicken.class, boundingBox).size();
-		case 1: return minecraft.theWorld.getEntitiesWithinAABB(EntityPig.class, boundingBox).size();
-		case 2: return minecraft.theWorld.getEntitiesWithinAABB(EntitySheep.class, boundingBox).size();
-		case 3: return minecraft.theWorld.getEntitiesWithinAABB(EntityCow.class, boundingBox).size() - this.countEntity(5);
-		case 4: return minecraft.theWorld.getEntitiesWithinAABB(EntityHorse.class, boundingBox).size();
-		case 5: return minecraft.theWorld.getEntitiesWithinAABB(EntityMooshroom.class, boundingBox).size();
-		case 6: return minecraft.theWorld.getEntitiesWithinAABB(EntityRabbit.class, boundingBox).size();
-		case 7: return minecraft.theWorld.getEntitiesWithinAABB(EntityWolf.class, boundingBox).size();
+		case 0: return minecraft.world.getEntitiesWithinAABB(EntityChicken.class, boundingBox).size();
+		case 1: return minecraft.world.getEntitiesWithinAABB(EntityPig.class, boundingBox).size();
+		case 2: return minecraft.world.getEntitiesWithinAABB(EntitySheep.class, boundingBox).size();
+		case 3: return minecraft.world.getEntitiesWithinAABB(EntityCow.class, boundingBox).size() - this.countEntity(5);
+		case 4: return minecraft.world.getEntitiesWithinAABB(EntityHorse.class, boundingBox).size();
+		case 5: return minecraft.world.getEntitiesWithinAABB(EntityMooshroom.class, boundingBox).size();
+		case 6: return minecraft.world.getEntitiesWithinAABB(EntityRabbit.class, boundingBox).size();
+		case 7: return minecraft.world.getEntitiesWithinAABB(EntityWolf.class, boundingBox).size();
 
-		case 8: return (minecraft.theWorld.getEntitiesWithinAABB(EntityZombie.class, hostileBB).size() - this.countEntity(14));
-		case 9: return minecraft.theWorld.getEntitiesWithinAABB(EntityCaveSpider.class, hostileBB).size();
-		case 10: return minecraft.theWorld.getEntitiesWithinAABB(EntitySkeleton.class, hostileBB).size();
-		case 11: return (minecraft.theWorld.getEntitiesWithinAABB(EntitySpider.class, hostileBB).size() - this.countEntity(9));
-		case 12: return minecraft.theWorld.getEntitiesWithinAABB(EntityCreeper.class, hostileBB).size();
-		case 13: return minecraft.theWorld.getEntitiesWithinAABB(EntityWitch.class, hostileBB).size();
-		case 14: return minecraft.theWorld.getEntitiesWithinAABB(EntityPigZombie.class, hostileBB).size();
-		case 15: return minecraft.theWorld.getEntitiesWithinAABB(EntitySlime.class, hostileBB).size();
-		case 16: return minecraft.theWorld.getEntitiesWithinAABB(EntityGuardian.class, hostileBB).size();
+		case 8: return (minecraft.world.getEntitiesWithinAABB(EntityZombie.class, hostileBB).size() - this.countEntity(14));
+		case 9: return minecraft.world.getEntitiesWithinAABB(EntityCaveSpider.class, hostileBB).size();
+		case 10: return minecraft.world.getEntitiesWithinAABB(EntitySkeleton.class, hostileBB).size();
+		case 11: return (minecraft.world.getEntitiesWithinAABB(EntitySpider.class, hostileBB).size() - this.countEntity(9));
+		case 12: return minecraft.world.getEntitiesWithinAABB(EntityCreeper.class, hostileBB).size();
+		case 13: return minecraft.world.getEntitiesWithinAABB(EntityWitch.class, hostileBB).size();
+		case 14: return minecraft.world.getEntitiesWithinAABB(EntityPigZombie.class, hostileBB).size();
+		case 15: return minecraft.world.getEntitiesWithinAABB(EntitySlime.class, hostileBB).size();
+		case 16: return minecraft.world.getEntitiesWithinAABB(EntityGuardian.class, hostileBB).size();
 
-		case 17: return minecraft.theWorld.getEntitiesWithinAABB(EntityIronGolem.class, boundingBox).size();
-		case 18: return minecraft.theWorld.getEntitiesWithinAABB(EntitySnowman.class, boundingBox).size();
-		case 20: return minecraft.theWorld.getEntitiesWithinAABB(EntityPlayer.class, boundingBox).size() - 1;
+		case 17: return minecraft.world.getEntitiesWithinAABB(EntityIronGolem.class, boundingBox).size();
+		case 18: return minecraft.world.getEntitiesWithinAABB(EntitySnowman.class, boundingBox).size();
+		case 20: return minecraft.world.getEntitiesWithinAABB(EntityPlayer.class, boundingBox).size() - 1;
 
 		}
 		return 0;
@@ -78,7 +78,7 @@ public class MobCounter {
 
 	public void updateBB()
 	{
-		EntityPlayer player = Minecraft.getMinecraft().thePlayer;
+		EntityPlayer player = Minecraft.getMinecraft().player;
 		this.boundingBox = new AxisAlignedBB(player.posX - this.radius, player.posY - this.radius, player.posZ - this.radius, 
 				player.posX + this.radius, player.posY + this.radius, player.posZ + this.radius);
 	}
@@ -87,7 +87,7 @@ public class MobCounter {
 	{
 		if (!this.xp5)
 		{
-			EntityPlayer player = Minecraft.getMinecraft().thePlayer;
+			EntityPlayer player = Minecraft.getMinecraft().player;
 			this.hostileBB = new AxisAlignedBB(player.posX - this.hRadius, player.posY - this.hRadius, player.posZ - this.hRadius, 
 					player.posX + this.hRadius, player.posY + this.hRadius, player.posZ + this.hRadius);
 		}
